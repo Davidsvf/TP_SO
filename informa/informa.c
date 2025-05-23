@@ -10,7 +10,6 @@
 
 int main(int argc, char *argv[]){
     struct stat info;
-    char buffer[MAX];
 
     if(argc != 2){
         char *erro = "Forma correta: informa <ficheiro>\n";
