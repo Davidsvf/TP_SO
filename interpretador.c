@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-#define MAX_COMMAND_LENGTH 1024
+#define MAX 1000
 
 void execute_command(char* command) {
     pid_t pid;
@@ -19,7 +19,7 @@ void execute_command(char* command) {
     }
     else if (pid == 0) {
 
-        char* argumentos[MAX_COMMAND_LENGTH / 2 + 1];
+        char* argumentos[MAX / 2 + 1];
         char* token;
         int indice = 0;
 
@@ -55,13 +55,14 @@ void execute_command(char* command) {
 }
 
 int main() {
-    char command[MAX_COMMAND_LENGTH];
+    char command[MAX];
     while (1) {
         const char* prompt = "% ";
         write(STDOUT_FILENO, prompt, strlen(prompt));
 
-        if (fgets(command, sizeof(command), stdin) == NULL) {
-            perror("Comando lido sem sucesso");
+        if (fgets(command, sizeof(command), stdin) == NULL){
+            char *erro = "Erro ao ler comando";
+            write(STDERR_FILENO, erro, sizeof(erro));
             exit(1);
         }
 
