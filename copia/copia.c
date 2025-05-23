@@ -33,6 +33,7 @@ int main(int argc, char* argv[]){
         char* erro = "Erro ao criar ficheiro destino!\n";
         write(STDERR_FILENO, erro, strlen(erro));
         close(fd_in);
+
         if(close(fd_in)<0){
             char* erro = "Erro ao fechar ficheiro!\n";
             write(STDERR_FILENO, erro, strlen(erro));
@@ -53,7 +54,6 @@ int main(int argc, char* argv[]){
             return 1;
         }
     }
-
     if(bytes_lidos==-1){
         char* erro = "Erro ao ler do ficheiro!\n";
         write(STDERR_FILENO, erro, strlen(erro));

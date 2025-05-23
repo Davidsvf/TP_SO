@@ -21,7 +21,7 @@ int main(int argc, char *argv[]){
     }
 
     char caracter;
-    int linhas=1;
+    int linhas=0;
     ssize_t leitura;
 
     while((leitura = read(ficheiro, &caracter, 1)) >0){   // enquanto houver caracteres para ler (read retoma 0 no fim do ficheiro)
