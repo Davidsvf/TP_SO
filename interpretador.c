@@ -6,85 +6,83 @@
 
 #define MAX 1000
 
-void execute_command(char* command) {
+void executar_comando(char* comando) {
     pid_t pid;
-    int codigo_saida;
+    int estado;
 
     pid = fork();
 
     if (pid < 0){
         char *erro = "Fork falhou\n";
-        write(STDERR_FILENO,erro, sizeof(erro));
+        write(STDERR_FILENO,erro, strlen(erro));
         exit(1);
     }
     else if (pid == 0) {
 
         char* argumentos[MAX / 2 + 1];
         char* token;
-        int indice = 0;
+        int i = 0;
 
-        token = strtok(command, " \t\n");
+        token = strtok(comando, " \t\n");
 
         while (token != NULL) {
-            argumentos[indice++] = token;
+            argumentos[i++] = token;
             token = strtok(NULL, " \t\n");
         }
-        argumentos[indice] = NULL;
+        argumentos[i] = NULL;
 
         if (execvp(argumentos[0], argumentos) < 0){
             char *erro = "Execução falhou\n";
-            write(STDERR_FILENO,erro, sizeof(erro));
+            write(STDERR_FILENO,erro, strlen(erro));
             exit(1);
         }
     }
     else {
 
-        waitpid(pid, &codigo_saida, 0);
+        waitpid(pid, &estado, 0);
 
-        if (WIFEXITED(codigo_saida)) {
-            int exit_status = WEXITSTATUS(codigo_saida);
-            char msg[128];
-            snprintf(msg, sizeof(msg), "O comando %s terminou com o código %d\n", command, exit_status);
-            write(STDOUT_FILENO, msg, strlen(msg));
+        if (WIFEXITED(estado)) {
+            int codigo = WEXITSTATUS(estado);
+            printf("O comando %s terminou com o código %d\n", comando, estado);
         }
         else {
-            char msg[128] = "Comando não funcionou\n";
-            write(STDOUT_FILENO, msg, strlen(msg));
+            char *erro = "Comando não funcionou\n";
+            write(STDOUT_FILENO, erro, strlen(erro));
         }
     }
 }
 
 int main() {
-    char command[MAX];
+    char comando[MAX];
     while (1) {
         const char* prompt = "% ";
         write(STDOUT_FILENO, prompt, strlen(prompt));
 
-        if (fgets(command, sizeof(command), stdin) == NULL){
+        if (fgets(comando, sizeof(comando), stdin) == NULL){
             char *erro = "Erro ao ler comando";
-            write(STDERR_FILENO, erro, sizeof(erro));
+            write(STDERR_FILENO, erro, strlen(erro));
             exit(1);
         }
 
-        size_t tamanho = strlen(command);
-        if (command[tamanho - 1] == '\n') {
-            command[tamanho - 1] = '\0';
+        size_t tamanho = strlen(comando);
+        if (comando[tamanho - 1] == '\n') {
+            comando[tamanho - 1] = '\0';
         }
 
-        if (strcmp(command, "termina") == 0) {
+        if (strcmp(comando, "termina") == 0) {
             break;
         }
 
-        if (strncmp(command, "cd ", 3) == 0) {
-            char* caminho = command + 3;
+        if (strncmp(comando, "cd ", 3) == 0) {
+            char* caminho = comando + 3;
             if (chdir(caminho) != 0) {
                 char *erro = "cd falhou";
-                write(STDERR_FILENO, erro, sizeof(erro));
+                write(STDERR_FILENO, erro, strlen(erro));
             }
             continue;
         }
 
-        execute_command(command);
+        executar_comando(comando);
     }
 
     return 0;
